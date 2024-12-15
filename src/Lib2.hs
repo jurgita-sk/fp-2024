@@ -37,7 +37,7 @@ data State = State
   { garden :: Garden
   } deriving (Show, Eq)
 
-
+-- <string>
 parseString :: String -> Either String (String, String)
 parseString [] = Left "String Error: empty input"
 parseString str = 
@@ -46,6 +46,7 @@ parseString str =
        then Right (beforeSpace, "")  
        else Right (beforeSpace, tail rest)
 
+-- <number>
 parseNumber :: String -> Either String (Int, String)
 parseNumber [] = Left " Num Error: empty input"
 parseNumber str =
@@ -61,6 +62,7 @@ parseChar :: Char -> String -> Either String (Char, String)
 parseChar c [] = Left ("Char Error: empty input")
 parseChar c s@(h:t) = if c == h then Right (c, t) else Left (c : " is not found in " ++ s)
 
+-- <flower> ::= <species> ' ' <color> ' ' <height>
 parseFlower :: String -> Either String (Flower, String)
 parseFlower [] = Left "Empty input"
 parseFlower str = 
@@ -80,6 +82,7 @@ parseFlower str =
                     }
               in Right (flower, rest3)
 
+-- <garden> ::= <flower> ' ' <garden> | <flower>
 parseGarden :: String -> Either String ([Flower], String)
 parseGarden str =
     case parseFlower str of
