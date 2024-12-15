@@ -3,8 +3,12 @@
 <species> ::= <string>
 <color> ::= <string>
 <height> ::= <integer>
+
 <integer> ::= <digit> | <digit> <integer>
 <digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 
-<add_flower> ::= 'ADD' <flower>
-<remove_flower> ::= 'REMOVE' <flower>
+commands = 
+    <add_flower> ::= 'ADD' <flower> |
+    <add_garden> ::= 'ADD_GARDEN' <garden> |
+    <remove_flower> ::= 'REMOVE' <flower>
+
