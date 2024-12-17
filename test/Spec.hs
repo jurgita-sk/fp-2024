@@ -1,6 +1,10 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 import Test.Tasty ( TestTree, defaultMain, testGroup )
 import Test.Tasty.HUnit ( testCase, (@?=) )
+import Test.Tasty.QuickCheck as QC
+
+import Data.List
+import Data.Ord
 
 import Lib1 qualified
 import Lib2 qualified
@@ -9,7 +13,8 @@ main :: IO ()
 main = defaultMain tests
 
 tests :: TestTree
-tests = testGroup "All Tests" [lib1Tests, lib2Tests]
+tests = testGroup "Tests" [lib1Tests, unitTests, propertyTests]
+
 
 lib1Tests :: TestTree
 lib1Tests = testGroup "Lib1 tests"
@@ -17,16 +22,10 @@ lib1Tests = testGroup "Lib1 tests"
       null Lib1.completions @?= False
   ]
 
-lib2Tests :: TestTree
-lib2Tests = testGroup "Lib2 tests"
-  [ testParseQuery
-  , testEmptyState
-  , testStateTransition
-  ]
-
-testParseQuery :: TestTree
-testParseQuery = testGroup "parseQuery tests"
-  [ testCase "Parse Add command" $ do
+unitTests :: TestTree
+unitTests = testGroup "Lib2 tests"
+  [ 
+    testCase "Parse Add command" $ do
       let input = "Add rose red 50"
       Lib2.parseQuery input @?= Right (Lib2.Add (Lib2.Flower "rose" "red" 50))
 
@@ -46,20 +45,12 @@ testParseQuery = testGroup "parseQuery tests"
   , testCase "Parse invalid command" $ do
       let input = "InvalidCommand"
       Lib2.parseQuery input @?= Left "Query Error: unrecognized query command"
-  ]
 
-
-testEmptyState :: TestTree
-testEmptyState = testGroup "emptyState tests"
-  [ testCase "Empty state has an empty garden" $ do
+    testCase "Empty state has an empty garden" $ do
       let state = Lib2.emptyState
       Lib2.garden state @?= Lib2.Garden []
-  ]
 
-
-testStateTransition :: TestTree
-testStateTransition = testGroup "stateTransition tests"
-  [ testCase "Add a flower to an empty garden" $ do
+    testCase "Add a flower to an empty garden" $ do
       let flower = Lib2.Flower "rose" "red" 50
           state = Lib2.emptyState
       Lib2.stateTransition state (Lib2.Add flower) @?= Right (Nothing, state {Lib2.garden = Lib2.Garden [flower]})
@@ -85,4 +76,11 @@ testStateTransition = testGroup "stateTransition tests"
       let flowers = [Lib2.Flower "rose" "red" 50, Lib2.Flower "tulip" "yellow" 30]
           state = Lib2.State (Lib2.Garden flowers)
       Lib2.stateTransition state Lib2.ShowState @?= Right (Just (show state), state)
+  ]
+
+propertyTests :: TestTree
+propertyTests = testGroup "some meaningful name"
+  [
+    QC.testProperty "sort == sort . reverse" $
+      \list -> sort (list :: [Int]) == sort (reverse list)
   ]
